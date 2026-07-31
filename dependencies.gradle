@@ -1,0 +1,12 @@
+dependencies {
+    // Required by Essential Craft itself. Versions match the maintained 1.7.10
+    // environment used by this continuation.
+    api(rfg.deobf("curse.maven:dummycore-230103:2244260"))
+    api("com.github.GTNewHorizons:Baubles-Expanded:2.2.21-GTNH:dev")
+
+    // Optional integrations are compile-time only; EC4 guards them with mod
+    // presence checks at runtime.
+    compileOnly("com.github.GTNewHorizons:NotEnoughItems:2.8.100-GTNH:dev")
+    compileOnly("com.github.GTNewHorizons:waila:1.19.29:dev")
+    compileOnly(rfg.deobf("curse.maven:thaumcraft-223628:2227552"))
+}

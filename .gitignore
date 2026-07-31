@@ -213,3 +213,22 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+#################
+## Gradle / IDE / Minecraft run directories
+#################
+
+.gradle/
+.idea/
+.vscode/
+out/
+eclipse/
+run/
+config/
+crash-reports/
+logs/
+saves/
+*.iml
+*.ipr
+*.iws
+/.build-template/
