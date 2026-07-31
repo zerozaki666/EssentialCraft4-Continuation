@@ -31,7 +31,11 @@ public class WorldGenManager implements IWorldGenerator{
 	public void handlePossibleOverworldGen(Random random, int chunkX, int chunkZ, World world,IChunkProvider chunkGenerator, IChunkProvider chunkProvider)
 	{
 		WorldGenElementalDrops.handleGeneration(random, chunkX, chunkZ, world, chunkGenerator, chunkProvider);
-		WorldGenElderMRUCC.handleGeneration(random, chunkX, chunkZ, world, chunkGenerator, chunkProvider);
+		// Elder MRUCU generation immediately spawns an EntityMRUPresence. Keep it
+		// out of secondary WorldServerMulti dimensions, which may populate chunks
+		// before their entity tracking infrastructure is fully initialized.
+		if(world.provider.dimensionId == 0)
+			WorldGenElderMRUCC.handleGeneration(random, chunkX, chunkZ, world, chunkGenerator, chunkProvider);
 	}
 	
 	public void handleEndGen(Random random, int chunkX, int chunkZ, World world,IChunkProvider chunkGenerator, IChunkProvider chunkProvider)
