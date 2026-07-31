@@ -50,16 +50,27 @@ val verifyClientModelResources by tasks.registering {
     group = "verification"
     description = "Verifies that the production jar contains every required EC4 OBJ model."
     dependsOn(reobfJar)
+    inputs.property("requiredClientModels", requiredClientModels)
+    inputs.files(requiredClientModels.map { layout.projectDirectory.file("src/main/resources/$it") })
+    inputs.files(reobfJar.map { it.outputs.files })
 
-    doLast {
-        val missingSources = requiredClientModels.filterNot {
-            layout.projectDirectory.file("src/main/resources/$it").asFile.isFile
-        }
+    doLast { task ->
+        val requiredModels = (task.inputs.properties["requiredClientModels"] as Iterable<*>).map { it.toString() }
+        val packagedInputs = task.inputs.files.files
+        val sourceModels = packagedInputs
+            .asSequence()
+            .filter { it.isFile && it.extension.equals("obj", ignoreCase = true) }
+            .map {
+                it.invariantSeparatorsPath.substringAfter("/src/main/resources/", missingDelimiterValue = "")
+            }
+            .filter { it.isNotEmpty() }
+            .toSet()
+        val missingSources = requiredModels.filterNot(sourceModels::contains)
         check(missingSources.isEmpty()) {
             "Required client model sources are missing:\n${missingSources.joinToString("\n")}"
         }
 
-        val productionJars = reobfJar.get().outputs.files.files.filter {
+        val productionJars = packagedInputs.filter {
             it.isFile && it.extension.equals("jar", ignoreCase = true)
         }
         check(productionJars.size == 1) {
@@ -67,7 +78,7 @@ val verifyClientModelResources by tasks.registering {
         }
 
         JarFile(productionJars.single()).use { jar ->
-            val missingPackagedModels = requiredClientModels.filter { jar.getEntry(it) == null }
+            val missingPackagedModels = requiredModels.filter { jar.getEntry(it) == null }
             check(missingPackagedModels.isEmpty()) {
                 "Production jar is missing required client models:\n${missingPackagedModels.joinToString("\n")}"
             }
@@ -76,8 +87,8 @@ val verifyClientModelResources by tasks.registering {
             }
         }
 
-        logger.lifecycle(
-            "Verified ${requiredClientModels.size} required OBJ models in ${productionJars.single().name}",
+        task.logger.lifecycle(
+            "Verified ${requiredModels.size} required OBJ models in ${productionJars.single().name}",
         )
     }
 }
