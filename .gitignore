@@ -59,6 +59,7 @@ build/
 *.ilk
 *.meta
 *.obj
+!src/main/resources/assets/essentialcraft/textures/special/models/**/*.obj
 *.pch
 *.pdb
 *.pgc
