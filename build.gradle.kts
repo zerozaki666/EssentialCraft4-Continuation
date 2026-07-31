@@ -54,9 +54,9 @@ val verifyClientModelResources by tasks.registering {
     inputs.files(requiredClientModels.map { layout.projectDirectory.file("src/main/resources/$it") })
     inputs.files(reobfJar.map { it.outputs.files })
 
-    doLast { task ->
-        val requiredModels = (task.inputs.properties["requiredClientModels"] as Iterable<*>).map { it.toString() }
-        val packagedInputs = task.inputs.files.files
+    doLast {
+        val requiredModels = (inputs.properties["requiredClientModels"] as Iterable<*>).map { it.toString() }
+        val packagedInputs = inputs.files.files
         val sourceModels = packagedInputs
             .asSequence()
             .filter { it.isFile && it.extension.equals("obj", ignoreCase = true) }
@@ -87,7 +87,7 @@ val verifyClientModelResources by tasks.registering {
             }
         }
 
-        task.logger.lifecycle(
+        logger.lifecycle(
             "Verified ${requiredModels.size} required OBJ models in ${productionJars.single().name}",
         )
     }
